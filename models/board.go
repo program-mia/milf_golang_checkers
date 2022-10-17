@@ -157,45 +157,50 @@ func (board *Board) getAvailableMovesFor(isWhite bool) map[int]Move {
 			}
 
 			possibleMoves := [2]int{-1, 1}
-			direction := 1
 
-			if isWhite {
-				direction = -1
+			allDirections := [2]int{-1, 1}
+			var directions []int
+
+			if pawn.is_queen {
+				directions = allDirections
+			} else if pawn.is_white {
+				directions = allDirections[0:1]
+			} else {
+				directions = allDirections[1:2]
 			}
 
-			// TODO if Pawn is a queen, it can go both directons
-
 			for _, val := range possibleMoves {
-
-				if !board.doesFieldExist(x+val, y+direction) {
-					continue
-				}
-
-				if board.isFieldEmpty(x+val, y+direction) {
-					availableMoves[len(availableMoves)] = Move{
-						from_x: x,
-						from_y: y,
-						to_x:   x + val,
-						to_y:   y + direction,
+				for _, direction := range directions {
+					if !board.doesFieldExist(x+val, y+direction) {
+						continue
 					}
 
-					continue
-				}
+					if board.isFieldEmpty(x+val, y+direction) {
+						availableMoves[len(availableMoves)] = Move{
+							from_x: x,
+							from_y: y,
+							to_x:   x + val,
+							to_y:   y + direction,
+						}
 
-				if !board.doesFieldHasPawnOfGivenColor(x+val, y+direction, !isWhite) {
-					continue
-				}
+						continue
+					}
 
-				if !board.doesFieldExist(x+(val*2), y+(direction*2)) {
-					continue
-				}
+					if !board.doesFieldHasPawnOfGivenColor(x+val, y+direction, !isWhite) {
+						continue
+					}
 
-				if board.isFieldEmpty(x+(val*2), y+(direction*2)) {
-					availableMoves[len(availableMoves)] = Move{
-						from_x: x,
-						from_y: y,
-						to_x:   x + (val * 2),
-						to_y:   y + (direction * 2),
+					if !board.doesFieldExist(x+(val*2), y+(direction*2)) {
+						continue
+					}
+
+					if board.isFieldEmpty(x+(val*2), y+(direction*2)) {
+						availableMoves[len(availableMoves)] = Move{
+							from_x: x,
+							from_y: y,
+							to_x:   x + (val * 2),
+							to_y:   y + (direction * 2),
+						}
 					}
 				}
 			}
