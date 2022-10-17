@@ -159,18 +159,19 @@ func (board *Board) getAvailableMovesFor(isWhite bool) map[int]Move {
 			possibleMoves := [2]int{-1, 1}
 
 			allDirections := [2]int{-1, 1}
-			var directions []int
+			sliceFrom := 0
+			sliceTo := 2
 
 			if pawn.is_queen {
-				directions = allDirections
+				// I am just lazy and need to not change anything when pawn was promoted
 			} else if pawn.is_white {
-				directions = allDirections[0:1]
+				sliceTo = 1
 			} else {
-				directions = allDirections[1:2]
+				sliceFrom = 1
 			}
 
 			for _, val := range possibleMoves {
-				for _, direction := range directions {
+				for _, direction := range allDirections[sliceFrom:sliceTo] {
 					if !board.doesFieldExist(x+val, y+direction) {
 						continue
 					}
@@ -270,6 +271,16 @@ func (board *Board) MovePiece(move Move, isWhiteMove bool) bool {
 
 	if xDiff == 2 {
 		board.board[(move.from_y+move.to_y)/2][(move.from_x+move.to_x)/2].pawn = nil
+	}
+
+	movedPawn := board.board[move.to_y][move.to_x].pawn
+
+	if movedPawn.is_white && move.to_y == 0 {
+		movedPawn.is_queen = true
+	}
+
+	if !movedPawn.is_white && move.to_y == 8 {
+		movedPawn.is_queen = true
 	}
 
 	return true
